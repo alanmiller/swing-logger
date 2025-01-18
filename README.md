@@ -6,7 +6,7 @@ Swing Logger is a python application that monitors an mlm2pro-gspro-connect.log 
 I wrote this because I wanted to include the swing data in a different application (running on a different host) and I wanted to save a history of swing results in a database for later historical analysis.
 
 ### Other Use Cases
-This little app is obviously very specific to the log entries used by the [MLM2PRO-GSPro-Connector](https://github.com/springbok/MLM2PRO-GSPro-Connector) but it might be useful for other uses cases. If you just want to monitor a specific log file on one host for activity and make it available to other hosts via an API, you'd just need to modify the sqlite table and queries in ```src/db/database```, the fields file path in ```src/config/config.py``` and the parsing logic in ```src/main/py```. And of course you'd want to update the APIs in ```src/api.py``.
+This little app is obviously very specific to the log entries used by the [MLM2PRO-GSPro-Connector](https://github.com/springbok/MLM2PRO-GSPro-Connector) but it might be useful for other uses cases. If you just want to monitor a specific log file on one host for activity and make it available to other hosts via an API, you'd just need to modify the sqlite table and queries in ```src/db/database```, the fields file path in ```config.yaml``` and the parsing logic in ```src/main.py```. And of course you'd want to update the APIs in ```src/api.py```.
 
 Currently there are only 2 APIs defined 
 
@@ -18,23 +18,24 @@ Currently there are only 2 APIs defined
 ## Project Structure
 ```
 swing-logger
+│
+├── config.yaml              # Configuration settings
 ├── src
-│   ├── main.py       # Main logic for monitoring log files
-│   ├── api.py        # API endpoint definitions and logic
+│   ├── main.py              # Main logic for monitoring log files
+│   ├── api.py               # API endpoint definitions and logic
 │   ├── db
 │   │   └── database.py      # Database connection and operations
-│   ├── utils
-│   │   └── logger.py        # Utility functions for logging
-│   └── config
-│       └── config.py        # Configuration settings
-├── requirements.txt          # Project dependencies
-└── README.md                 # Project documentation
+│   └── utils
+│       └── logger.py        # Utility functions for logging
+├── requirements.txt         # Project dependencies
+├── LICENSE                  # License file
+└── README.md                # Project documentation
 ```
 
 ## Installation
 1. Clone the repository:
    ```
-   git clone <repository-url>
+   git clone https://github.com/alanmiller/swing-logger.git
    cd swing-logger
    ```
 
@@ -45,34 +46,44 @@ swing-logger
 
 ## Configuration
 
-Modify the `src/config/config.py` file to set the log file path and database connection details according to your environment.
+Modify the `config.yaml` file to set the log file paths and port & listen address to you liking.
 
-Example config.py:
+Example config.yaml:
 
 ```
-class Config:
-    # Path to the mlm2pro-gspro-connect.log file
-    LOG_FILE_PATH = 'E:\\MLM-2PRO-GSPro-Connector_V1.04.09\\appdata\\logs\\mlm2pro-gspro-connect.log'
-    # Path to the sqlite file (will be created) if it does not already exist
-    DATABASE_PATH = 'sqlite://E:\\swing-logger\\swing.db'
-    # Log level for the logger
-    LOG_LEVEL = logging.INFO
-    # Fields to be extracted from the JSON log entry
-    JSON_FIELDS = [
-        'new_shot', 'club', 'speed', 
-        'spin_axis', 'total_spin', 'hla', 'vla', 'club_speed', 'back_spin', 
-        'side_spin', 'path', 'face_to_target', 'angle_of_attack', 'speed_at_impact'
-    ]
-    # Log entries to be monitored
-    MONITORED_LOG_ENTRIES = ["GSProConnect: Success"]
+log_file_path: 'E:\\MLM-2PRO-GSPro-Connector_V1.04.09\\appdata\\logs\\mlm2pro-gspro-connect.log'
+database_path: 'sqlite://E:\\swing-logger\\swing.db'
+log_level: DEBUG
+json_fields:
+  - new_shot
+  - club
+  - speed
+  - spin_axis
+  - total_spin
+  - hla
+  - vla
+  - club_speed
+  - back_spin
+  - side_spin
+  - path
+  - face_to_target
+  - angle_of_attack
+  - speed_at_impact
+monitored_log_entries:
+  - "GSProConnect: Success"
+port: 9210
+listen_address: '0.0.0.0'
 ```
 
 ## Usage
 
 ### Run the swing logger application using the following command:
 
+The `--conf` argument is optional and will default to config.yaml in the current directory if present.
+
 ```
-python src/main.py
+python src/main.py  [ --conf <path to config.yaml> ]
+
 ```
 
 ### Call the APIs
@@ -82,7 +93,7 @@ After some new swings have been logged to mlm2pro-gspro-connect.log, you can cal
 #### Get the last swing
 
 ```
-[user@host] curl http://localhost:5000/lastswing
+[user@host] curl http://localhost:9210/lastswing
 {
   "angle_of_attack": -2.82,
   "back_spin": 9032.0,
@@ -104,7 +115,7 @@ After some new swings have been logged to mlm2pro-gspro-connect.log, you can cal
 #### Get all 4-iron swings
 
 ```
-[user@host] http://localhost:5000/swings/I4
+[user@host] http://localhost:9210/swings/I4
 [
   {
     "angle_of_attack": -2.82,
@@ -144,7 +155,7 @@ After some new swings have been logged to mlm2pro-gspro-connect.log, you can cal
 ```
 
 ## License
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Copyright
 Copyright (c) 2025 Alan Miller

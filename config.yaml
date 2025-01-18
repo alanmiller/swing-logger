@@ -1,0 +1,22 @@
+log_file_path: '/Users/almiller/workspaces/swing-logger/mlm2pro-gspro-connect.log'
+database_path: 'sqlite:///Users/almiller/Workspaces/swing-logger/swing.db'
+log_level: DEBUG
+json_fields:
+  - new_shot
+  - club
+  - speed
+  - spin_axis
+  - total_spin
+  - hla
+  - vla
+  - club_speed
+  - back_spin
+  - side_spin
+  - path
+  - face_to_target
+  - angle_of_attack
+  - speed_at_impact
+monitored_log_entries:
+  - "GSProConnect: Success"
+port: 9210
+listen_address: '0.0.0.0'
