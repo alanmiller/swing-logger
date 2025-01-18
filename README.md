@@ -83,7 +83,6 @@ The `--conf` argument is optional and will default to config.yaml in the current
 
 ```
 python src/main.py  [ --conf <path to config.yaml> ]
-
 ```
 
 ### Call the APIs
