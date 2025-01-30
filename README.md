@@ -1,12 +1,16 @@
 # Swing Logger
 
 ## Overview
-Swing Logger is a python application that monitors an mlm2pro-gspro-connect.log file from springbok's famous [MLM2PRO-GSPro-Connector](https://github.com/springbok/MLM2PRO-GSPro-Connector) in a background thread for swing data. When it detects a new swing entry, it stores the details in a SQLite database. On the frontend it exposes 2 web-apis that allow you to retrieve the swing results from a remote computer. 
+Swing Logger is a python application that monitors a log file in a background thread for swing data, stores the data to a db, and exposes 2 web-apis  that allow you to retrieve the swing results from a remote computer. The format of the log entries and the JSON structure is specific to 2 use cases.
+
+   - The **mlm2pro-gspro-connect.log** file from springbok's famous [MLM2PRO-GSPro-Connector](https://github.com/springbok/MLM2PRO-GSPro-Connector). When it detects a new swing entry, it stores the details in a local SQLite database. 
+   
+   - The **output_log.txt** file from [GSPro](https://gsprogolf.com/). When a swing is detected it stores the details to a MySQL database specified on the config.
 
 I wrote this because I wanted to include the swing data in a different application (running on a different host) and I wanted to save a history of swing results in a database for later historical analysis.
 
 ### Other Use Cases
-This little app is obviously very specific to the log entries used by the [MLM2PRO-GSPro-Connector](https://github.com/springbok/MLM2PRO-GSPro-Connector) but it might be useful for other uses cases. If you just want to monitor a specific log file on one host for activity and make it available to other hosts via an API, you'd just need to modify the sqlite table and queries in ```src/db/database```, the fields file path in ```config.yaml``` and the parsing logic in ```src/main.py```. And of course you'd want to update the APIs in ```src/api.py```.
+This little app is obviously very specific to the log entries used by the [MLM2PRO-GSPro-Connector](https://github.com/springbok/MLM2PRO-GSPro-Connector) and [GSPro](https://gsprogolf.com/) but it might be useful for other uses cases. If you just want to monitor a specific log file on one host for activity and make it available to other hosts via an API, you'd just need to modify the sqlite or mysql schemas and queries in ```src/db/database```, the fields file path in ```config.yaml``` and the parsing logic in ```src/main.py```. And of course you'd want to update the APIs in ```src/api.py```.
 
 Currently there are only 2 APIs defined 
 
@@ -24,7 +28,9 @@ swing-logger
 │   ├── main.py              # Main logic for monitoring log files
 │   ├── api.py               # API endpoint definitions and logic
 │   ├── db
-│   │   └── database.py      # Database connection and operations
+│   │   ├── database.py      # Database interface for using sqlite
+│   │   ├── shot_database.py # Database interface for using mysql
+│   │   └── shots.sql        # Database schema for mysql
 │   └── utils
 │       └── logger.py        # Utility functions for logging
 ├── requirements.txt         # Project dependencies
@@ -48,9 +54,17 @@ swing-logger
 
 Modify the `config.yaml` file to set the log file paths and port & listen address to you liking.
 
-Example config.yaml:
+Example config for mlm2gspro mode:
 
 ```
+data_store: 'sqlite'  
+data_source: 'mlm2gspro'
+log_level: INFO
+
+# for api binding
+port: 9210
+listen_address: '0.0.0.0'
+
 log_file_path: 'E:\\MLM-2PRO-GSPro-Connector_V1.04.09\\appdata\\logs\\mlm2pro-gspro-connect.log'
 database_path: 'sqlite://E:\\swing-logger\\swing.db'
 log_level: DEBUG
@@ -71,8 +85,28 @@ json_fields:
   - speed_at_impact
 monitored_log_entries:
   - "GSProConnect: Success"
+```
+
+Example config for gspro mode:
+
+```
+data_store: 'mysql'  
+data_source: 'gspro' 
+log_level: INFO
+
+# for api binding
 port: 9210
 listen_address: '0.0.0.0'
+
+# for gspro mode (use mysql)
+gspro:
+  log_file_path: 'C:\\Users\\my-user-name\\AppData\\LocalLow\\GSPro\\GSPro\\output_log.txt'
+mysql:
+  host: '10.20.30.40'
+  db: 'swingstudio'
+  table: 'shots'
+  user: 'sql-user'
+  pass: 'sql-pass'
 ```
 
 ## Usage

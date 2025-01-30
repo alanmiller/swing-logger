@@ -1,6 +1,24 @@
+data_store: 'mysql'  # 'sqlite' or 'mysql'
+data_source: 'gspro' # 'gspro' or 'mlm2gspro'
+log_level: INFO
+
+# for api binding
+port: 9210
+listen_address: '0.0.0.0'
+
+# for gspro mode (use mysql)
+gspro:
+  log_file_path: 'C:\\Users\\almiller\\AppData\\LocalLow\\GSPro\\GSPro\\output_log.txt'
+mysql:
+  host: 'x.x.x.x'
+  db: 'swingstudio'
+  table: 'shots'
+  user: 'xxxx'
+  pass: 'xxxx'
+
+# for mls2pro-gspro-connector mode (use sqlite)
 log_file_path: 'E:\\MLM-2PRO-GSPro-Connector_V1.04.09\\appdata\\logs\\mlm2pro-gspro-connect.log'
 database_path: 'sqlite://E:\\swing-logger\\swing.db'
-log_level: INFO
 json_fields:
   - new_shot
   - club
@@ -18,15 +36,3 @@ json_fields:
   - speed_at_impact
 monitored_log_entries:
   - "GSProConnect: Success"
-port: 9210
-listen_address: '0.0.0.0'
-data_store: 'mysql' # 'sqlite' or 'mysql'
-data_source: 'gspro' # 'gspro' or 'mlm2gspro'
-mysql:
-  host: '192.168.254.52'
-  db: 'swingstudio'
-  table: 'shots'
-  user: 'xxxx'
-  pass: 'xxxx'
-gspro:
-  log_file_path: 'C:\\Users\\xxxx\\AppData\\LocalLow\\GSPro\\GSPro\\output_log.txt'

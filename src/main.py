@@ -217,10 +217,10 @@ if __name__ == "__main__":
     thread = threading.Thread(target=main, args=(settings,))
     thread.daemon = True
     thread.start()
-    logging.info("Swing logger started")
+    logging.info(f"Swing logger started in {settings['data_source']} mode.")
 
     # Run the Flask app in the main thread
-    logging.info("Starting API server")
+    logging.info(f"Starting API server on {settings['listen_address']}:{settings['port']}.")
 
     if settings['data_store'] == 'mysql':
         db = ShotDatabase(settings['mysql']['host'], settings['mysql']['user'], 
