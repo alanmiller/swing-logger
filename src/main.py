@@ -5,13 +5,15 @@ import json
 import threading
 import logging
 import sqlite3
+import pymysql
 from queue import Queue
 import yaml
 from polling import poll
-from api import app
+from api import create_app
 from db.database import Database
+from db.shot_database import ShotDatabase
 
-class LogHandler():
+class LMHandler():
     """ Class to handle file system events for the log file """
     def __init__(self, queue, db, config):
         self.queue = queue
@@ -20,7 +22,7 @@ class LogHandler():
         self.json_fields = config['json_fields']
         self.monitored_log_entries = config['monitored_log_entries']
         self.last_modified = None
-        logging.debug("LogHandler initialized with config: %s", config)
+        logging.debug("LMHandler initialized with config: %s", config)
 
     def check_file_modified(self):
         """ Check if the log file has been modified """
@@ -66,7 +68,82 @@ class LogHandler():
                 except (IndexError, json.JSONDecodeError) as e:
                     logging.error("Failed to parse log entry: %s error: %s", line, e)
 
-def database_worker(queue, db, lock):
+class GSProHandler():
+    """ Class to handle file system events for the log file """
+    def __init__(self, queue, db, config):
+        self.queue = queue
+        self.db = db
+        self.config = config
+        self.last_modified = None
+        self.log_file_path = self.config['gspro']['log_file_path']
+        logging.debug("GSProHandler initialized with config: %s", config)
+
+    def check_file_modified(self):
+        """ Check if the log file has been modified """
+        try:
+            modified_time = os.path.getmtime(self.log_file_path)
+            if self.last_modified is None or modified_time > self.last_modified:
+                self.last_modified = modified_time
+                logging.debug("File modified: %s", self.log_file_path)
+                self.on_modified()
+        except FileNotFoundError:
+            logging.error("Log file not found: %s", self.log_file_path)
+
+    def on_modified(self):
+        """ Process the log file when it's modified """
+        logging.info("Processing log file: %s", self.log_file_path)
+        with open(self.log_file_path, 'r', encoding="utf-8") as file:
+            lines = file.readlines()
+            for line in lines:
+                self.process_log_entry(line)
+
+    def process_log_entry(self, line):
+        """ Process a single log entry """
+        logging.debug("Processing log entry: %s", line)
+        try:
+            # Remove any leading/trailing whitespace
+            line = line.strip()
+            
+            if 'ShotKey' in line and 'BallData' in line:
+                # Parse the JSON string into a Python dictionary
+                shot_data = json.loads(line)
+            
+                # Validate that this is a shot entry
+                if 'ShotKey' in shot_data and 'BallData' in shot_data:
+                    self.queue.put(shot_data)
+                    logging.debug("Queued swing: %s", shot_data['ShotKey'])
+                else:
+                    print("Line does not contain valid shot data")
+                
+        except json.JSONDecodeError as e:
+            print(f"Error decoding JSON: {e}")
+            
+        except Exception as e:
+            print(f"Error processing shot: {e}")
+
+def mysql_worker(queue, db, lock):
+    """ Worker function to insert swing data into mysql database """
+    logging.info("Database worker started")
+    while True:
+        swing_data = queue.get()
+        if swing_data is None:
+            logging.info("Database worker received exit signal")
+            break
+        logging.debug("Inserting shot data into database: %s", swing_data)
+        try:
+            with lock:
+                db.insert_shot(swing_data)
+        except pymysql.err.IntegrityError as e:
+            if e.args[0] == 1062:  # MySQL error code for duplicate entry
+                # silently ignore
+                pass
+            else:
+                logging.error("Error inserting shot data: %s", e)
+        except pymysql.DatabaseError as e:
+            logging.error("Error inserting shot data: %s", e)
+        queue.task_done()
+
+def sqlite_worker(queue, db, lock):
     """ Worker function to insert swing data into the database """
     logging.info("Database worker started")
     while True:
@@ -91,13 +168,27 @@ def load_config(config_file):
 
 def main(config):
     """ Main function to start the log handler and database worker """
-    db = Database()
+
+    # if using mysql for long term storage, connect and initialize it here
+    if settings['data_store'] == 'mysql':
+        db = ShotDatabase(settings['mysql']['host'], settings['mysql']['user'], 
+                          settings['mysql']['pass'], settings['mysql']['db'],
+                          settings['mysql']['table'])
+    else:
+        db = Database()
     queue = Queue()
     lock = threading.Lock()
 
-    event_handler = LogHandler(queue, db, config)
+    # which file we are monitoring
+    if settings['data_source'] == 'gspro':
+        event_handler = GSProHandler(queue, db, config)
+        target=mysql_worker
+        log_file_path = settings['gspro']['log_file_path']
+    else:
+        event_handler = LMHandler(queue, db, config)
+        target=sqlite_worker
 
-    worker_thread = threading.Thread(target=database_worker, args=(queue, db, lock))
+    worker_thread = threading.Thread(target=target, args=(queue, db, lock))
     worker_thread.start()
     logging.info("Worker thread started")
     try:
@@ -130,4 +221,13 @@ if __name__ == "__main__":
 
     # Run the Flask app in the main thread
     logging.info("Starting API server")
+
+    if settings['data_store'] == 'mysql':
+        db = ShotDatabase(settings['mysql']['host'], settings['mysql']['user'], 
+                          settings['mysql']['pass'], settings['mysql']['db'],
+                          settings['mysql']['table'])
+        app = create_app(db,'mysql')
+    else:
+        db = Database()
+        app = create_app(db,'sqlite')
     app.run(debug=False, host=settings['listen_address'], port=settings['port'])
