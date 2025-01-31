@@ -127,8 +127,6 @@ class GSProHandler():
                     print("Line does not contain valid shot data")
         except json.JSONDecodeError as e:
             print(f"Error decoding JSON: {e}")
-        except Exception as e:
-            print(f"Error processing shot: {e}")
 
 def mysql_worker(queue, db, lock):
     """ Worker function to insert swing data into mysql database """
@@ -178,8 +176,8 @@ def load_config(config_file):
 def main(config):
     """ Main function to start the log handler and database worker """
     # if using mysql for long term storage, connect and initialize it here
-    if settings['data_store'] == 'mysql':
-        db = ShotDatabase(settings)
+    if config['data_store'] == 'mysql':
+        db = ShotDatabase(config)
     else:
         db = Database()
     queue = Queue()
@@ -227,7 +225,7 @@ if __name__ == "__main__":
     # Run the Flask app in the main thread
     addr = settings['listen_address']
     port = settings['port']
-    logging.info("Starting API server on %s:%s.", (addr, port))
+    logging.info("Starting API server on %s:%s.", addr, port)
 
     if settings['data_store'] == 'mysql':
         database = ShotDatabase(settings)
