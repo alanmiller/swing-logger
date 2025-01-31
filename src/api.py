@@ -18,7 +18,7 @@ def create_app(db,dbType):
                 # Dynamically construct the JSON response
                 column_names = [desc[1] for desc in db.conn.execute(pragma).fetchall()]
             elif app.dbType == 'mysql':
-                cursor = db.getCursor()
+                cursor = db.get_cursor()
                 cursor.execute("SHOW COLUMNS FROM shots")
                 column_names = [row[0] for row in cursor.fetchall()]
             result = {column_names[i]: last_swing[i] for i in range(len(column_names))}
@@ -38,7 +38,7 @@ def create_app(db,dbType):
             if app.dbType == 'sqlite':
                 column_names = [desc[1] for desc in db.conn.execute(pragma).fetchall()]
             elif app.dbType == 'mysql':
-                cursor = db.getCursor()
+                cursor = db.get_cursor()
                 cursor.execute("SHOW COLUMNS FROM shots")
                 column_names = [row[0] for row in cursor.fetchall()]
             results = [

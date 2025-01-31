@@ -1,8 +1,8 @@
+""" Database module for mysql operations """
 import pymysql
-from datetime import datetime
-import json
 
 class ShotDatabase:
+    """ Class to handle database operations """
     def __init__(self, host, user, password, database, table):
         self.connection = pymysql.connect(
             host=host,
@@ -64,7 +64,8 @@ class ShotDatabase:
         self.cursor.execute(query, values)
         self.connection.commit()
 
-    def getCursor(self):
+    def get_cursor(self):
+        """Return the cursor"""
         return self.cursor
 
     def get_last_swing(self):
