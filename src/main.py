@@ -184,7 +184,7 @@ def main(config):
     lock = threading.Lock()
 
     # which file we are monitoring
-    if settings['data_source'] == 'gspro':
+    if config['data_source'] == 'gspro':
         event_handler = GSProHandler(queue, db, config)
         target=mysql_worker
     else:
