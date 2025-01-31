@@ -1,10 +1,11 @@
 """ This module contains the API endpoints for the Flask application. """
 from flask import Flask, jsonify
 
-def create_app(db,dbType):
+def create_app(db,db_type):
+    """ Create a Flask app for the provided database """
     app = Flask(__name__)
     app.db = db
-    app.dbType = dbType
+    app.db_type = db_type
 
     @app.route('/lastswing', methods=['GET'])
     def get_last_swing():
@@ -14,10 +15,10 @@ def create_app(db,dbType):
         pragma = 'PRAGMA table_info(swings)'
         last_swing = db.get_last_swing()
         if last_swing:
-            if app.dbType == 'sqlite':
+            if app.db_type == 'sqlite':
                 # Dynamically construct the JSON response
                 column_names = [desc[1] for desc in db.conn.execute(pragma).fetchall()]
-            elif app.dbType == 'mysql':
+            elif app.db_type == 'mysql':
                 cursor = db.get_cursor()
                 cursor.execute("SHOW COLUMNS FROM shots")
                 column_names = [row[0] for row in cursor.fetchall()]
@@ -35,9 +36,9 @@ def create_app(db,dbType):
         swings = db.get_swings_by_club(club)
         if swings:
             # Dynamically construct the JSON response
-            if app.dbType == 'sqlite':
+            if app.db_type == 'sqlite':
                 column_names = [desc[1] for desc in db.conn.execute(pragma).fetchall()]
-            elif app.dbType == 'mysql':
+            elif app.db_type == 'mysql':
                 cursor = db.get_cursor()
                 cursor.execute("SHOW COLUMNS FROM shots")
                 column_names = [row[0] for row in cursor.fetchall()]

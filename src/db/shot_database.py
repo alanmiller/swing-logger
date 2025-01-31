@@ -3,14 +3,15 @@ import pymysql
 
 class ShotDatabase:
     """ Class to handle database operations """
-    def __init__(self, host, user, password, database, table):
+    def __init__(self, settings):
+        """ Initialize the database connection """            
         self.connection = pymysql.connect(
-            host=host,
-            user=user,
-            password=password,
-            database=database
+            host=settings['mysql']['host'],
+            user=settings['mysql']['user'],
+            password=settings['mysql']['pass'],
+            database=settings['mysql']['db']
         )
-        self.table = table
+        self.table = settings['mysql']['table']
         self.cursor = self.connection.cursor()
 
     def insert_shot(self, shot_data):

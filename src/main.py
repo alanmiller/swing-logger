@@ -228,8 +228,9 @@ if __name__ == "__main__":
     logging.info(f"Swing logger started in {settings['data_source']} mode.")
 
     # Run the Flask app in the main thread
-    logging.info(f"Starting API server on
-                  {settings['listen_address']}:{settings['port']}.")
+    addr = settings['listen_address']
+    port = settings['port']
+    logging.info(f"Starting API server on {addr}:{port}.")
 
     if settings['data_store'] == 'mysql':
         database = ShotDatabase(settings['mysql']['host'], settings['mysql']['user'], 
