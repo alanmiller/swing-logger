@@ -233,9 +233,7 @@ if __name__ == "__main__":
     logging.info(f"Starting API server on {addr}:{port}.")
 
     if settings['data_store'] == 'mysql':
-        database = ShotDatabase(settings['mysql']['host'], settings['mysql']['user'], 
-                          settings['mysql']['pass'], settings['mysql']['db'],
-                          settings['mysql']['table'])
+        database = ShotDatabase(settings)
         app = create_app(database,'mysql')
     else:
         database = Database()
