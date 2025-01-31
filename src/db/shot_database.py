@@ -12,7 +12,7 @@ class ShotDatabase:
         )
         self.table = table
         self.cursor = self.connection.cursor()
-        
+
     def insert_shot(self, shot_data):
         """Insert shot data from JSON into database"""
         query = f"""
@@ -29,7 +29,7 @@ class ShotDatabase:
             %s, %s, %s, %s, %s, %s, %s, %s
         )
         """
-        
+
         values = (
             shot_data['ShotKey'],
             shot_data['RoundKey'],
@@ -60,20 +60,19 @@ class ShotDatabase:
             shot_data['EndingPOS']['y'],
             shot_data['EndingPOS']['z']
         )
-        
+
         self.cursor.execute(query, values)
         self.connection.commit()
-    
+
     def getCursor(self):
         return self.cursor
-    
+
     def get_last_swing(self):
         """Get the last swing from the database"""
         query = f"SELECT * FROM {self.table} ORDER BY 'created_at' DESC LIMIT 1"
         self.cursor.execute(query)
-        #self.connection.commit()
         return self.cursor.fetchone()
-    
+
     def get_swings_by_club(self, club):
         """Get all shots for a specific club"""
         # TODO: determin club_index from club_name

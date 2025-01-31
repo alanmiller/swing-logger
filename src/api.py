@@ -11,11 +11,12 @@ def create_app(db,dbType):
         """ Get the last swing from the database """
         payload = ''
         code = 204
+        pragma = 'PRAGMA table_info(swings)'
         last_swing = db.get_last_swing()
         if last_swing:
             if app.dbType == 'sqlite':
                 # Dynamically construct the JSON response
-                column_names = [desc[1] for desc in db.conn.execute('PRAGMA table_info(swings)').fetchall()]
+                column_names = [desc[1] for desc in db.conn.execute(pragma).fetchall()]
             elif app.dbType == 'mysql':
                 cursor = db.getCursor()
                 cursor.execute("SHOW COLUMNS FROM shots")
@@ -30,12 +31,12 @@ def create_app(db,dbType):
         """ Get all swings for a given club from the database """
         payload = ''
         code = 204
+        pragma = 'PRAGMA table_info(swings)'
         swings = db.get_swings_by_club(club)
         if swings:
             # Dynamically construct the JSON response
             if app.dbType == 'sqlite':
-                column_names = [desc[1] for desc in db.conn.execute('PRAGMA table_info(swings)').fetchall()]
-               
+                column_names = [desc[1] for desc in db.conn.execute(pragma).fetchall()]
             elif app.dbType == 'mysql':
                 cursor = db.getCursor()
                 cursor.execute("SHOW COLUMNS FROM shots")
@@ -47,5 +48,4 @@ def create_app(db,dbType):
             payload = jsonify(results)
             code = 200
         return payload, code
-    
     return app

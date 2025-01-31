@@ -12,7 +12,6 @@
 # nuitka-project: --product-name=Swing-Logger
 # nuitka-project: --product-version=1.0.0.0
 
-# py.exe -m nuitka --show-progress --output-dir=E:\temp\build --main=src\main.py
 import argparse
 import os
 import json
@@ -78,7 +77,7 @@ class LMHandler():
                         self.queue.put(filtered_data)
                         logging.debug("Queued swing data: %s", filtered_data)
                     else:
-                        logging.debug("Duplicate entry found for timestamp: %s", timestamp)
+                        logging.debug("Duplicate entry for timestamp: %s", timestamp)
                 except (IndexError, json.JSONDecodeError) as e:
                     logging.error("Failed to parse log entry: %s error: %s", line, e)
 
@@ -117,21 +116,17 @@ class GSProHandler():
         try:
             # Remove any leading/trailing whitespace
             line = line.strip()
-            
             if 'ShotKey' in line and 'BallData' in line:
                 # Parse the JSON string into a Python dictionary
                 shot_data = json.loads(line)
-            
                 # Validate that this is a shot entry
                 if 'ShotKey' in shot_data and 'BallData' in shot_data:
                     self.queue.put(shot_data)
                     logging.debug("Queued swing: %s", shot_data['ShotKey'])
                 else:
                     print("Line does not contain valid shot data")
-                
         except json.JSONDecodeError as e:
             print(f"Error decoding JSON: {e}")
-            
         except Exception as e:
             print(f"Error processing shot: {e}")
 
@@ -182,7 +177,6 @@ def load_config(config_file):
 
 def main(config):
     """ Main function to start the log handler and database worker """
-
     # if using mysql for long term storage, connect and initialize it here
     if settings['data_store'] == 'mysql':
         db = ShotDatabase(settings['mysql']['host'], settings['mysql']['user'], 
@@ -234,14 +228,15 @@ if __name__ == "__main__":
     logging.info(f"Swing logger started in {settings['data_source']} mode.")
 
     # Run the Flask app in the main thread
-    logging.info(f"Starting API server on {settings['listen_address']}:{settings['port']}.")
+    logging.info(f"Starting API server on
+                  {settings['listen_address']}:{settings['port']}.")
 
     if settings['data_store'] == 'mysql':
-        db = ShotDatabase(settings['mysql']['host'], settings['mysql']['user'], 
+        database = ShotDatabase(settings['mysql']['host'], settings['mysql']['user'], 
                           settings['mysql']['pass'], settings['mysql']['db'],
                           settings['mysql']['table'])
-        app = create_app(db,'mysql')
+        app = create_app(database,'mysql')
     else:
-        db = Database()
-        app = create_app(db,'sqlite')
+        database = Database()
+        app = create_app(database,'sqlite')
     app.run(debug=False, host=settings['listen_address'], port=settings['port'])
