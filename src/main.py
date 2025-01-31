@@ -179,9 +179,7 @@ def main(config):
     """ Main function to start the log handler and database worker """
     # if using mysql for long term storage, connect and initialize it here
     if settings['data_store'] == 'mysql':
-        db = ShotDatabase(settings['mysql']['host'], settings['mysql']['user'], 
-                          settings['mysql']['pass'], settings['mysql']['db'],
-                          settings['mysql']['table'])
+        db = ShotDatabase(settings)
     else:
         db = Database()
     queue = Queue()
@@ -230,7 +228,7 @@ if __name__ == "__main__":
     # Run the Flask app in the main thread
     addr = settings['listen_address']
     port = settings['port']
-    logging.info(f"Starting API server on {addr}:{port}.")
+    logging.info("Starting API server on %s:%s." % (addr, port))
 
     if settings['data_store'] == 'mysql':
         database = ShotDatabase(settings)
