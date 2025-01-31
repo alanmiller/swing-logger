@@ -18,8 +18,8 @@ import json
 import threading
 import logging
 import sqlite3
-import pymysql
 from queue import Queue
+import pymysql
 import yaml
 from polling import poll
 from api import create_app
@@ -189,7 +189,6 @@ def main(config):
     if settings['data_source'] == 'gspro':
         event_handler = GSProHandler(queue, db, config)
         target=mysql_worker
-        log_file_path = settings['gspro']['log_file_path']
     else:
         event_handler = LMHandler(queue, db, config)
         target=sqlite_worker
@@ -223,12 +222,12 @@ if __name__ == "__main__":
     thread = threading.Thread(target=main, args=(settings,))
     thread.daemon = True
     thread.start()
-    logging.info(f"Swing logger started in {settings['data_source']} mode.")
+    logging.info("Swing logger started in %s mode.", settings['data_source'])
 
     # Run the Flask app in the main thread
     addr = settings['listen_address']
     port = settings['port']
-    logging.info("Starting API server on %s:%s." % (addr, port))
+    logging.info("Starting API server on %s:%s.", (addr, port))
 
     if settings['data_store'] == 'mysql':
         database = ShotDatabase(settings)
