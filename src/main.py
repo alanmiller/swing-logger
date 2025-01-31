@@ -1,4 +1,18 @@
 """ Main module to start the log handler and database worker """
+# Compilation mode, support OS-specific options
+# nuitka-project-if: {OS} in ("Windows", "Linux", "FreeBSD"):
+#    nuitka-project: --onefile
+# nuitka-project-if: {OS} in ("Darwin"):
+#   nuitka-project: --mode=app
+# nuitka-project-else:
+#    nuitka-project: --mode=standalonealone
+# nuitka-project: --include-data-files={MAIN_DIRECTORY}/../config.yaml=config.yaml
+# nuitka-project: --file-description=swinglogger
+# nuitka-project: --file-version=1.0
+# nuitka-project: --product-name=Swing-Logger
+# nuitka-project: --product-version=1.0.0.0
+
+# py.exe -m nuitka --show-progress --output-dir=E:\temp\build --main=src\main.py
 import argparse
 import os
 import json
