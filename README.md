@@ -1,6 +1,7 @@
-![pylint]() [![Nuitka-Compile](https://github.com/alanmiller/swing-logger/actions/workflows/nuitka.yml/badge.svg)](https://github.com/alanmiller/swing-logger/actions/workflows/nuitka.yml)
+[![Pylint](https://github.com/alanmiller/swing-logger/actions/workflows/pylint.yml/badge.svg)](https://github.com/alanmiller/swing-logger/actions/workflows/pylint.yml) 
+[![Nuitka-Compile](https://github.com/alanmiller/swing-logger/actions/workflows/nuitka.yml/badge.svg)](https://github.com/alanmiller/swing-logger/actions/workflows/nuitka.yml)
 
-# Swing Logger
+![pylint](https://img.shields.io/badge/PyLint-10.00-brightgreen?logo=python&logoColor=white)
 
 ## Overview
 Swing Logger is a python application that monitors a log file in a background thread for swing data, stores the data to a db, and exposes 2 web-apis  that allow you to retrieve the swing results from a remote computer. The format of the log entries and the JSON structure is specific to 2 use cases.
