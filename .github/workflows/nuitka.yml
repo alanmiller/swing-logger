@@ -42,7 +42,6 @@ jobs:
             build/*.exe
             build/*.bin
           include-hidden-files: true
-          include-hidden-files: true
 
   release:
     needs: build
