@@ -1,3 +1,5 @@
+[![Nuitka-Compile](https://github.com/alanmiller/swing-logger/actions/workflows/nuitka.yml/badge.svg)](https://github.com/alanmiller/swing-logger/actions/workflows/nuitka.yml)
+
 # Swing Logger
 
 ## Overview
