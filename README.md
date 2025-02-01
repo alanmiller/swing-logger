@@ -1,7 +1,7 @@
 [![Pylint](https://github.com/alanmiller/swing-logger/actions/workflows/pylint.yml/badge.svg)](https://github.com/alanmiller/swing-logger/actions/workflows/pylint.yml) 
 [![Nuitka-Compile](https://github.com/alanmiller/swing-logger/actions/workflows/nuitka.yml/badge.svg)](https://github.com/alanmiller/swing-logger/actions/workflows/nuitka.yml)
 
-![pylint]()
+![pylint](https://img.shields.io/badge/PyLint-10.00-brightgreen?logo=python&logoColor=white)
 
 # Swing Logger
 
