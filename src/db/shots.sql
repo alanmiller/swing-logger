@@ -36,3 +36,8 @@ CREATE TABLE shots (
     
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE clubs (
+    club_index INT PRIMARY KEY,
+    club_name VARCHAR(8)
+);
