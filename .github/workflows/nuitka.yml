@@ -6,7 +6,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -27,15 +27,45 @@ jobs:
         run: |
           pip install -r requirements.txt
 
+      - name: Read Version
+        id: get_version
+        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+
       - name: Build Executable (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          python -m nuitka --onefile --output-filename=swinglogger.exe src/main.py
+          python -m nuitka --onefile \
+            --output-filename=swinglogger.exe \
+            --product-version=${{ env.VERSION }} \
+            --include-data-files={MAIN_DIRECTORY}/../config.yaml=config.yaml \
+            --file-description=swinglogger \
+            --product-name=Swing-Logger \
+            --file-version=1.0 \
+            src/main.py
 
       - name: Build Executable (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
-          python -m nuitka --onefile --output-filename=swinglogger src/main.py
+          python -m nuitka --onefile \
+            --output-filename=swinglogger \
+            --product-version=${{ env.VERSION }} \
+            --include-data-files={MAIN_DIRECTORY}/../config.yaml=config.yaml \
+            --file-description=swinglogger \
+            --product-name=Swing-Logger \
+            --file-version=1.0 \
+            src/main.py
+
+      - name: Build Executable (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          python -m nuitka --mode=app --macos-app-icon=logger.png \
+            --output-filename=swinglogger \
+            --product-version=${{ env.VERSION }} \
+            --include-data-files={MAIN_DIRECTORY}/../config.yaml=config.yaml \
+            --file-description=swinglogger \
+            --product-name=Swing-Logger \
+            --file-version=1.0 \
+            src/main.py
 
       - name: Upload Artifacts (Windows)
         if: matrix.os == 'windows-latest'
@@ -50,6 +80,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linux-build
+          path: swinglogger
+          include-hidden-files: true
+
+      - name: Upload Artifacts (macOS)
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
           path: swinglogger
           include-hidden-files: true
 
@@ -71,6 +109,12 @@ jobs:
         with:
           name: linux-build
           path: ./artifacts/linux
+
+      - name: Download Artifacts (macOS)
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-build
+          path: ./artifacts/macos
 
       - name: Create Release
         id: create_release
@@ -100,6 +144,16 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./artifacts/linux/swinglogger
+          asset_name: swinglogger
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset (macOS)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/macos/swinglogger
           asset_name: swinglogger
           asset_content_type: application/octet-stream
 

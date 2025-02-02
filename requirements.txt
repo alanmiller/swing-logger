@@ -3,3 +3,4 @@ polling==0.3.2
 PyYAML==6.0.2
 PyMysql==1.1.1
 Nuitka==2.5.9
+imageio=2.37.0
