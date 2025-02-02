@@ -34,12 +34,12 @@ jobs:
       - name: Build Executable (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          python -m nuitka --onefile \
-            --output-filename=swinglogger.exe \
-            --product-version=${{ env.VERSION }} \
-            --file-description=swinglogger \
-            --product-name=Swing-Logger \
-            --file-version=1.0 \
+          python -m nuitka --onefile `
+            --output-filename=swinglogger.exe `
+            --product-version=${{ env.VERSION }} `
+            --file-description=swinglogger `
+            --product-name=Swing-Logger `
+            --file-version=1.0 `
             src/main.py
 
       - name: Build Executable (Linux)
