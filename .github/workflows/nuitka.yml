@@ -37,7 +37,6 @@ jobs:
           python -m nuitka --onefile \
             --output-filename=swinglogger.exe \
             --product-version=${{ env.VERSION }} \
-            --include-data-files={MAIN_DIRECTORY}/../config.yaml=config.yaml \
             --file-description=swinglogger \
             --product-name=Swing-Logger \
             --file-version=1.0 \
@@ -49,7 +48,6 @@ jobs:
           python -m nuitka --onefile \
             --output-filename=swinglogger \
             --product-version=${{ env.VERSION }} \
-            --include-data-files={MAIN_DIRECTORY}/../config.yaml=config.yaml \
             --file-description=swinglogger \
             --product-name=Swing-Logger \
             --file-version=1.0 \
@@ -61,7 +59,6 @@ jobs:
           python -m nuitka --mode=app --macos-app-icon=logger.png \
             --output-filename=swinglogger \
             --product-version=${{ env.VERSION }} \
-            --include-data-files={MAIN_DIRECTORY}/../config.yaml=config.yaml \
             --file-description=swinglogger \
             --product-name=Swing-Logger \
             --file-version=1.0 \
