@@ -2,3 +2,4 @@ Flask==3.1.0
 polling==0.3.2
 PyYAML==6.0.2
 PyMysql==1.1.1
+Nuitka==2.5.9

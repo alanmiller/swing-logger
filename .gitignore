@@ -5,6 +5,8 @@ __pycache__/
 # VSCode
 .vs/
 
+devnotes.txt
+
 # C extensions
 *.so
 # Sqlite database files
