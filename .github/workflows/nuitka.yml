@@ -74,7 +74,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-build
-          path: swinglogger.exe
+          path: main.dist\swinglogger.exe
           include-hidden-files: true
 
       - name: Upload Artifacts (Linux)
