@@ -34,7 +34,7 @@ jobs:
       - name: Build Executable (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          python -m nuitka --onefile `
+          python -m nuitka --onefile --standalone `
             --output-filename=swinglogger.exe `
             --product-version=${{ env.VERSION }} `
             --file-description=swinglogger `
@@ -56,7 +56,10 @@ jobs:
       - name: Build Executable (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          python -m nuitka --mode=app --macos-app-icon=logger.png \
+          python -m nuitka \
+            --standalone \
+            --macos-app-icon=logger.png \
+            --macos-create-app-bundle \
             --output-filename=swinglogger \
             --product-version=${{ env.VERSION }} \
             --file-description=swinglogger \
