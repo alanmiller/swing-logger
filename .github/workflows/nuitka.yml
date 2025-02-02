@@ -6,7 +6,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -107,11 +107,11 @@ jobs:
           name: linux-build
           path: ./artifacts/linux
 
-      - name: Download Artifacts (macOS)
-        uses: actions/download-artifact@v4
-        with:
-          name: macos-build
-          path: ./artifacts/macos
+#      - name: Download Artifacts (macOS)
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: macos-build
+#          path: ./artifacts/macos
 
       - name: Create Release
         id: create_release
@@ -144,13 +144,13 @@ jobs:
           asset_name: swinglogger
           asset_content_type: application/octet-stream
 
-      - name: Upload Release Asset (macOS)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/macos/swinglogger
-          asset_name: swinglogger
-          asset_content_type: application/octet-stream
+#      - name: Upload Release Asset (macOS)
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }}
+#          asset_path: ./artifacts/macos/swinglogger
+#          asset_name: swinglogger
+#          asset_content_type: application/octet-stream
 
