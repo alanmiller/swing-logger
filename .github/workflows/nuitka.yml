@@ -123,14 +123,44 @@ jobs:
 #          name: macos-build
 #          path: ./artifacts/macos
 
+      - name: Get Latest Tag
+        id: get_latest_tag
+        run: |
+          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo "LATEST_TAG=$latest_tag" >> $GITHUB_ENV
+
+      - name: Determine Next Tag
+        id: determine_next_tag
+        run: |
+          if [ -z "${{ env.LATEST_TAG }}" ]; then
+            next_tag="v1.0.0"
+          else
+            latest_version=${{ env.LATEST_TAG }}
+            if [[ $latest_version =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+              major=${BASH_REMATCH[1]}
+              minor=${BASH_REMATCH[2]}
+              patch=${BASH_REMATCH[3]}
+              next_patch=$((patch + 1))
+              next_tag="v${major}.${minor}.${next_patch}"
+            elif [[ $latest_version =~ ^v([0-9]+)\.([0-9]+)$ ]]; then
+              major=${BASH_REMATCH[1]}
+              minor=${BASH_REMATCH[2]}
+              next_tag="v${major}.${minor}.0"
+            else
+              echo "Invalid tag format: $latest_version"
+              exit 1
+            fi
+          fi
+          echo "NEXT_TAG=$next_tag" >> $GITHUB_ENV
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
-          tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
+          tag_name: ${{ env.NEXT_TAG }}
+          release_name: Release ${{ env.NEXT_TAG }}
           draft: false
           prerelease: false
       
