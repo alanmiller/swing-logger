@@ -1,6 +1,11 @@
 name: Nuitka-Compile
 
-on: [push]
+on: # Trigger the workflow only on pushes to the '1.x' branch with matching 'v*.*.*' tag.
+  push:
+    branches:
+      - '1.x'
+    tags:
+      - 'v*.*.*'
 
 jobs:
   build:
