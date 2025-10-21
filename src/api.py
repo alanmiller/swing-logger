@@ -10,22 +10,26 @@ def create_app(db,db_type):
     @app.route('/lastswing', methods=['GET'])
     def get_last_swing():
         """ Get the last swing from the database """
-        payload = ''
-        code = 204
-        pragma = 'PRAGMA table_info(swings)'
-        last_swing = db.get_last_swing()
-        if last_swing:
-            if app.db_type == 'sqlite':
-                # Dynamically construct the JSON response
-                column_names = [desc[1] for desc in db.conn.execute(pragma).fetchall()]
-            elif app.db_type == 'mysql':
-                cursor = db.get_cursor()
-                cursor.execute("SHOW COLUMNS FROM shots")
-                column_names = [row[0] for row in cursor.fetchall()]
-            result = {column_names[i]: last_swing[i] for i in range(len(column_names))}
-            payload = jsonify(result)
-            code = 200
-        return payload, code
+        try:
+            payload = ''
+            code = 204
+            pragma = 'PRAGMA table_info(swings)'
+            last_swing = db.get_last_swing()
+            if last_swing:
+                if app.db_type == 'sqlite':
+                    # Dynamically construct the JSON response
+                    column_names = [desc[1] for desc in db.conn.execute(pragma).fetchall()]
+                elif app.db_type == 'mysql':
+                    cursor = db.get_cursor()
+                    cursor.execute(f"SHOW COLUMNS FROM {db.table}")
+                    column_names = [row[0] for row in cursor.fetchall()]
+                result = {column_names[i]: last_swing[i] for i in range(len(column_names))}
+                payload = jsonify(result)
+                code = 200
+            return payload, code
+        except Exception as e:
+            app.logger.error(f"Error in get_last_swing: {str(e)}")
+            return jsonify({"error": str(e)}), 500
 
     @app.route('/swings/<club>', methods=['GET'])
     def get_swings_by_club(club):
@@ -40,7 +44,7 @@ def create_app(db,db_type):
                 column_names = [desc[1] for desc in db.conn.execute(pragma).fetchall()]
             elif app.db_type == 'mysql':
                 cursor = db.get_cursor()
-                cursor.execute("SHOW COLUMNS FROM shots")
+                cursor.execute(f"SHOW COLUMNS FROM {db.table}")
                 column_names = [row[0] for row in cursor.fetchall()]
             results = [
                 {column_names[i]: swing[i] for i in range(len(column_names))}

@@ -71,24 +71,13 @@ class ShotDatabase:
 
     def get_last_swing(self):
         """Get the last swing from the database"""
-        query = """
-        SELECT shots.*, clubs.club_name 
-        FROM {self.table} AS shots
-        JOIN clubs ON shots.club_index = clubs.club_index 
-        ORDER BY shots.created_at DESC LIMIT 1
-        """
+        query = f"SELECT * FROM {self.table} ORDER BY shot_key DESC LIMIT 1"
         self.cursor.execute(query)
         return self.cursor.fetchone()
 
-    def get_swings_by_club(self, club_name, limit=25):
-        """Get all shots for a specific club by club_name"""
-        query = """
-        SELECT shots.* 
-        FROM shots 
-        JOIN clubs ON shots.club_index = clubs.club_index 
-        WHERE clubs.club_name = %s
-        LIMIT %s
-        """
-        self.cursor.execute(query, (club_name,limit))
+    def get_swings_by_club(self, club_index, limit=25):
+        """Get all shots for a specific club by club_index"""
+        query = f"SELECT * FROM {self.table} WHERE club_index = %s LIMIT %s"
+        self.cursor.execute(query, (club_index, limit))
         results = self.cursor.fetchall()
         return results

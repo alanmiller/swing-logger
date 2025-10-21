@@ -4,3 +4,5 @@ PyYAML==6.0.2
 PyMysql==1.1.1
 Nuitka==2.5.9
 imageio==2.37.0
+pywin32>=227
+pywin32-ctypes>=0.2.0
