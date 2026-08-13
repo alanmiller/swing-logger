@@ -175,5 +175,6 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+notes.txt
 nssm.exe
 service-wrapper.bat
